@@ -1,0 +1,718 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bentley Robotics Season Budget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: pit-notebook ledger in three parts. Each part opens with its summary, then a chart, then the detail table. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --ink:#14181d; --muted:#59636e; --line:#dde3e9;
+  --accent:#d9561a; --bar:#2a78d6; --bar-soft:#d6e4f6;
+  --s-spent:#4a3aa7; --s-planned:#1baf7a; --s-parts:#2a78d6; --s-extra:#eb6834;
+  --good:#1b8048; --warn:#a86a10; --bad:#c13b3b;
+  --good-bg:#e5f3ea; --warn-bg:#fbf0dc; --bad-bg:#f9e4e4; --info-bg:#e6eefa;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111519; --surface:#1a2026; --ink:#eef1f4; --muted:#9da8b4; --line:#2d353e;
+  --accent:#f07a3a; --bar:#3987e5; --bar-soft:#22354d;
+  --s-spent:#9085e9; --s-planned:#199e70; --s-parts:#3987e5; --s-extra:#d95926;
+  --good:#4cc07f; --warn:#e2a54a; --bad:#ef7a7a;
+  --good-bg:#16301f; --warn-bg:#33270f; --bad-bg:#3a1b1b; --info-bg:#1b2a3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111519; --surface:#1a2026; --ink:#eef1f4; --muted:#9da8b4; --line:#2d353e;
+  --accent:#f07a3a; --bar:#3987e5; --bar-soft:#22354d;
+  --s-spent:#9085e9; --s-planned:#199e70; --s-parts:#3987e5; --s-extra:#d95926;
+  --good:#4cc07f; --warn:#e2a54a; --bad:#ef7a7a;
+  --good-bg:#16301f; --warn-bg:#33270f; --bad-bg:#3a1b1b; --info-bg:#1b2a3d; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:20px;padding-block:28px 72px;display:grid;gap:56px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:clamp(2.2rem,6vw,3.4rem)}
+h2{font-size:clamp(1.7rem,4vw,2.3rem)}
+h3{font-size:1.3rem}
+p{margin:0;max-width:70ch}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.eyebrow b{color:var(--accent);font-weight:500}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+header{display:grid;gap:10px}
+header p{color:var(--muted)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.toc a{font-size:.9rem;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px}
+.toc a:hover,.toc a:focus-visible{border-color:var(--accent);outline:none}
+section{display:grid;gap:22px;scroll-margin-top:16px}
+.sec-head{display:grid;gap:8px;border-top:3px solid var(--ink);padding-top:14px}
+.sec-head p{color:var(--muted)}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tile{background:var(--surface);padding:16px 18px;display:grid;gap:4px;align-content:start}
+.tile .k{font-size:.78rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.tile .v{font-family:var(--f-display);font-size:2.1rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.tile .s{font-size:.86rem;color:var(--muted)}
+.tile.hi .v{color:var(--accent)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px;min-width:0}
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+
+/* horizontal bars */
+.hbars{display:grid;gap:10px}
+.hbar{display:grid;grid-template-columns:minmax(100px,160px) 1fr;gap:12px;align-items:center}
+.hbar .lab{font-size:.92rem;line-height:1.2}
+.hbar .lab small{display:block;color:var(--muted);font-size:.78rem}
+.track{position:relative;height:26px;display:flex;align-items:center;gap:8px}
+.fill{flex:none;height:22px;background:var(--bar);border-radius:0 4px 4px 0;min-width:2px;transition:width .35s ease}
+.fill.soft{background:var(--bar-soft);background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--bar) 35%,transparent) 5px 7px)}
+.track .val{font-family:var(--f-mono);font-size:.82rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hbar:hover .fill{filter:brightness(1.1)}
+.axis{display:grid;grid-template-columns:minmax(100px,160px) 1fr;gap:12px}
+.ticks{position:relative;height:18px;border-top:1px solid var(--line)}
+.ticks span{position:absolute;top:2px;transform:translateX(-50%);font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.ticks span:first-child{transform:none}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:.82rem;padding:6px 9px;border-radius:6px;z-index:30;max-width:250px;line-height:1.35}
+
+/* stacked strip */
+.strip{display:flex;height:30px;border-radius:6px;overflow:hidden;gap:2px}
+.strip div{height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.88rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.legend b{color:var(--ink);font-weight:600;font-family:var(--f-mono);font-size:.82rem}
+
+/* season bar vs $5k */
+.season{display:grid;gap:10px}
+.sbar{position:relative;height:44px;padding-top:0}
+.sbar .segs{position:absolute;inset:6px 0 6px 0;display:flex;gap:2px}
+.sbar .segs div{height:100%;transition:width .35s ease;min-width:0}
+.sbar .segs div:first-child{border-radius:4px 0 0 4px}
+.sbar .segs div:last-child{border-radius:0 4px 4px 0}
+.seg-buffer{background:var(--s-parts);background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--surface) 55%,transparent) 5px 8px)}
+.sbar .cap{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--ink);transition:left .35s ease}
+.sbar .cap span{position:absolute;bottom:100%;transform:translateX(-50%);font-family:var(--f-mono);font-size:.72rem;white-space:nowrap;margin-bottom:2px}
+.sbar-wrap{padding-top:18px}
+
+.issues{list-style:none;margin:0;padding:0;display:grid}
+.issues li{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.issues li:first-child{border-top:0;padding-top:0}
+.sev{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;padding:3px 7px;border-radius:4px;height:fit-content;white-space:nowrap}
+.sev.bad{background:var(--bad-bg);color:var(--bad)}
+.sev.warn{background:var(--warn-bg);color:var(--warn)}
+.issues b{font-weight:600}
+.issues p{color:var(--muted);font-size:.93rem}
+
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.flow div{display:grid;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.flow .k{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.flow .v{font-family:var(--f-mono);font-size:1.12rem;font-variant-numeric:tabular-nums}
+.flow .s{font-size:.8rem;color:var(--muted)}
+.flow .end{border-color:var(--accent)}
+.flow .end .v{color:var(--accent)}
+
+.have{display:flex;flex-wrap:wrap;gap:6px}
+.have span{font-size:.85rem;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--bg)}
+
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chk,.fbtn{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;font:inherit;font-weight:600;font-size:.9rem;color:var(--ink);user-select:none}
+.chk input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.chk:focus-within,.fbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.fbtn .c{font-family:var(--f-mono);font-size:.75rem;opacity:.75}
+
+/* tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+#part2 table{min-width:760px}
+#p1table{min-width:900px}
+th,td{text-align:left;padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right}
+tr.cat td{background:var(--bg);font-family:var(--f-display);font-weight:700;font-size:1.05rem;letter-spacing:.02em;padding-top:12px}
+tr.cat td .num{font-family:var(--f-mono);font-size:.85rem;font-weight:500;float:right}
+tr.off td{opacity:.42}
+tr.off td.qtycell{opacity:1}
+td .note{display:block;color:var(--muted);font-size:.82rem;line-height:1.35;margin-top:2px}
+td.why{color:var(--muted);font-style:italic;max-width:24ch}
+.pill{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;white-space:nowrap;display:inline-block}
+.pill.must{background:var(--ink);color:var(--surface)}
+.pill.should{border:1.5px solid var(--ink);color:var(--ink)}
+.st{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;display:inline-block}
+.st.bought{background:var(--info-bg);color:var(--bar)}
+.st.manual{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.st.never{background:transparent;color:var(--muted);border:1px dashed var(--muted)}
+.v-yes{background:var(--good-bg);color:var(--good)}
+.v-have{background:var(--info-bg);color:var(--bar)}
+.v-maybe{background:var(--warn-bg);color:var(--warn)}
+.v-no{background:var(--bg);color:var(--muted)}
+.est{font-family:var(--f-mono);font-size:.66rem;color:var(--warn);margin-left:4px}
+input[type=number]{width:60px;font:inherit;font-family:var(--f-mono);padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);text-align:right}
+input[type=number]:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+.totals{display:grid;gap:8px}
+.totals .row{display:flex;justify-content:space-between;gap:12px;font-size:.95rem;align-items:center}
+.totals .row span:first-child{color:var(--muted)}
+.totals .grand{border-top:2px solid var(--ink);padding-top:10px;font-size:1.08rem;font-weight:700}
+.totals .grand span:first-child{color:var(--ink)}
+.verdict{font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-family:var(--f-mono);font-size:.75rem;padding:3px 8px;border-radius:4px}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+
+/* part 3 */
+.tracker{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:grid;gap:10px;box-shadow:0 6px 18px -12px rgba(0,0,0,.35)}
+.tracker .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px 18px;flex-wrap:wrap}
+.tracker .big{font-family:var(--f-display);font-size:1.9rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.tracker .sub{font-size:.88rem;color:var(--muted)}
+.packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.pack{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;grid-template-rows:auto auto 1fr auto;transition:border-color .2s}
+.pack.on{border-color:var(--s-extra);box-shadow:inset 0 0 0 1px var(--s-extra)}
+.pack .sys{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.pack h3{font-size:1.2rem}
+.pack ul{margin:0;padding-left:18px;font-size:.88rem;color:var(--muted);display:grid;gap:2px}
+.pack .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:10px}
+.pack .cost{display:grid;line-height:1.2}
+.pack .cost b{font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.pack .cost span{font-size:.75rem;color:var(--muted)}
+.addbtn{font:inherit;font-weight:700;font-size:.88rem;padding:7px 14px;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+.addbtn[aria-pressed="true"]{background:var(--s-extra);border-color:var(--s-extra);color:#fff}
+.addbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.foot-notes{font-size:.85rem;color:var(--muted);display:grid;gap:6px}
+.foot-notes a{color:inherit}
+@media (prefers-reduced-motion:reduce){.fill,.sbar .segs div,.sbar .cap{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><b>FTC</b> · Bentley Robotics · prices checked Oct 7, 2026</div>
+    <h1>Bentley Robotics Season Budget</h1>
+    <p>Part 1 is what last season's ROV team really spent and whether any of it matters for FTC. Part 2 is the robot this year, measured against the $5,000 mark. Part 3 is optional extras you can switch on to see how far over they push you.</p>
+    <nav class="toc" aria-label="Sections">
+      <a href="#part1">1 · Last season</a><a href="#part2">2 · This season's robot</a><a href="#part3">3 · Extras</a><a href="#part4">4 · Next season</a>
+    </nav>
+  </header>
+
+  <!-- ================= PART 1 ================= -->
+  <section id="part1">
+    <div class="sec-head">
+      <div class="eyebrow">Part 1 · ROV season 2025-26</div>
+      <h2>What last season really cost</h2>
+      <p>You were told the real total was about $1,600. The budget sheet only shows $801 actually bought, so roughly $800 was spent and never logged. All figures below assume $1,600 is right.</p>
+    </div>
+
+    <div class="tiles">
+      <div class="tile hi"><span class="k">Real total (told)</span><span class="v">$1,600</span><span class="s">32% of the $5,000 budget</span></div>
+      <div class="tile"><span class="k">Logged &amp; bought</span><span class="v">$801</span><span class="s">24 items in the sheet</span></div>
+      <div class="tile"><span class="k">Never logged</span><span class="v">~$799</span><span class="s">half of all spending</span></div>
+      <div class="tile"><span class="k">Asked, never bought</span><span class="v">$350</span><span class="s">4 items, not in the $1,600</span></div>
+      <div class="tile"><span class="k">ROV-only gear</span><span class="v" id="rovOnly">–</span><span class="s" id="rovOnlyS">water, tether, cameras</span></div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="panel-head"><h3>Where the $1,600 went</h3><span class="eyebrow">USD, incl. tax</span></div>
+        <div class="hbars" id="sysChart"></div>
+        <div class="axis"><span></span><div class="ticks" id="sysTicks"></div></div>
+        <p class="small muted">The striped bar is the gap between $1,600 and what the sheet shows. Nobody can say what it bought, which is the main thing to fix this year.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>How much got tracked</h3><span class="eyebrow">of $1,600</span></div>
+        <div class="strip" role="img" aria-label="Logged through form $605, logged manually $196, never logged $799">
+          <div style="width:37.8%;background:var(--s-parts)"></div>
+          <div style="width:12.3%;background:var(--s-planned)"></div>
+          <div style="width:49.9%;background:var(--bar-soft);background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--bar) 35%,transparent) 5px 7px)"></div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--s-parts)"></i>Request form <b>$605</b></span>
+          <span><i style="background:var(--s-planned)"></i>Typed in by hand <b>$196</b></span>
+          <span><i style="background:var(--bar-soft);outline:1px solid var(--muted)"></i>Never logged <b>~$799</b></span>
+        </div>
+        <ul class="issues" style="margin-top:6px">
+          <li><span class="sev bad">Fix</span><div><b>Half the money left no record.</b><p>This year every purchase goes through the request form, including ones a coach pays for in person.</p></div></li>
+          <li><span class="sev bad">Fix</span><div><b>The old sheet's totals were broken.</b><p>"Total Spent" read $24.99, one tax formula slipped a row, and the budget cell was a #REF! error.</p></div></li>
+          <li><span class="sev warn">Check</span><div><b>CNC bits may have been ordered twice.</b><p>Rows 7 and 18 use the same eBay listing ($128 together).</p></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Everything ever requested, and whether FTC needs it</h3><span class="eyebrow">28 rows · "why" is the requester's own words</span></div>
+      <div class="controls" id="p1filters" role="group" aria-label="Filter by this year's need"></div>
+      <p class="small muted" id="p1sum"></p>
+    </div>
+    <div class="tablewrap">
+      <table id="p1table">
+        <thead><tr><th>Item</th><th>System</th><th>Status</th><th class="r">Cost</th><th>Why they asked</th><th>This year</th></tr></thead>
+        <tbody id="p1rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= PART 2 ================= -->
+  <section id="part2">
+    <div class="sec-head">
+      <div class="eyebrow">Part 2 · FTC 2026-27</div>
+      <h2>This season's robot, against $5,000</h2>
+      <p>This plan isn't squeezed to fit under $5,000. It adds what a competitive robot needs, plus 3D printing and shop supplies, then shows where the season lands next to the $5,000 mark.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>What you already have</h3><span class="eyebrow">paid, from Main Budget</span></div>
+      <div class="flow">
+        <div><span class="k">FTC Starter Kit V3.1</span><span class="v">$660.00</span><span class="s">+ $61.05 tax</span></div>
+        <div><span class="k">Control Hub kit</span><span class="v">$350.00</span><span class="s">+ $32.38 tax</span></div>
+        <div><span class="k">Driver Kit</span><span class="v">$295.00</span><span class="s">+ $27.30 tax</span></div>
+        <div class="end"><span class="k">Kits total</span><span class="v">$1,425.73</span><span class="s">plus $339.31 shipping</span></div>
+      </div>
+      <div class="have">
+        <span>Control Hub + Driver Hub</span><span>1 battery + charger</span><span>3 UltraPlanetary motors</span><span>1 Core Hex motor</span><span>3 Smart Robot Servos</span><span>Omni, traction &amp; grip wheels</span><span>34 extrusions + 6 C-channels</span><span>Gears, sprockets, chain</span><span>Screws, brackets, bearings</span>
+      </div>
+      <p class="small muted">Check the ROV shelf too. The label maker, threaded inserts, leftover PLA, zip ties and wire may still be there.</p>
+    </div>
+
+    <div class="panel season" aria-label="Season total compared with $5,000">
+      <div class="panel-head"><h3>The whole season vs. $5,000</h3><span class="eyebrow" id="seasonTag"></span></div>
+      <div class="sbar-wrap"><div class="sbar" id="sbar2"><div class="segs"></div><div class="cap"><span>$5,000</span></div></div></div>
+      <div class="legend" id="slegend2"></div>
+      <div class="verdict" id="verdict2"></div>
+    </div>
+
+    <div class="controls">
+      <span class="eyebrow">Include</span>
+      <label class="chk"><input type="checkbox" id="t-must" checked> Must</label>
+      <label class="chk"><input type="checkbox" id="t-should" checked> Should</label>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="panel-head"><h3>Robot cost by system</h3><span class="eyebrow">before tax</span></div>
+        <div class="hbars" id="catChart"></div>
+        <div class="axis"><span></span><div class="ticks" id="catTicks"></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>Season math</h3></div>
+        <div class="totals">
+          <div class="row"><span>Robot parts &amp; supplies</span><span class="num" id="o-parts"></span></div>
+          <div class="row"><span>Tax (9.25%)</span><span class="num" id="o-tax"></span></div>
+          <div class="row"><span>Shipping (est. 8%, ground)</span><span class="num" id="o-ship"></span></div>
+          <div class="row"><span><label for="bufpct">Unlogged small stuff</label> <input type="number" id="bufpct" min="0" max="50" step="5" value="10" style="width:52px">%</span><span class="num" id="o-buf"></span></div>
+          <div class="row grand"><span>New spending this year</span><span class="num" id="o-new"></span></div>
+          <div class="row"><span>Already spent (kits, reg, shipping)</span><span class="num">$2,115.04</span></div>
+          <div class="row"><span>Already planned (game set, pizza)</span><span class="num">$1,026.55</span></div>
+          <div class="row grand"><span>Season total</span><span class="num" id="o-season"></span></div>
+        </div>
+        <p class="small muted">The 10% buffer is there because half of last year's spending never got logged. Set it to 0 if every purchase this year goes through the form.</p>
+      </div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Part</th><th>Tier</th><th class="r">Qty</th><th class="r">Each</th><th class="r">Line</th></tr></thead>
+        <tbody id="rows2"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= PART 3 ================= -->
+  <section id="part3">
+    <div class="sec-head">
+      <div class="eyebrow">Part 3 · Nice to have</div>
+      <h2>Extras, and how far over they go</h2>
+      <p>None of these are in Part 2. Each button adds that package, with tax and shipping, on top of the Part 2 season total. The tracker stays pinned while you scroll.</p>
+    </div>
+
+    <div class="tracker" aria-live="polite">
+      <div class="top">
+        <div><div class="eyebrow">Season with extras</div><div class="big" id="t-total"></div></div>
+        <div class="sub" id="t-sub"></div>
+        <div class="controls"><button class="fbtn" id="addAll" type="button">Add all</button><button class="fbtn" id="clearAll" type="button">Clear</button></div>
+      </div>
+      <div class="sbar-wrap" style="padding-top:16px"><div class="sbar" id="sbar3"><div class="segs"></div><div class="cap"><span>$5,000</span></div></div></div>
+      <div class="legend" id="slegend3"></div>
+    </div>
+
+    <div class="packs" id="packs"></div>
+
+    <div class="foot-notes">
+      <p>Prices from <a href="https://www.revrobotics.com" target="_blank" rel="noopener">REV Robotics</a>, <a href="https://www.gobilda.com" target="_blank" rel="noopener">goBILDA</a> and <a href="https://andymark.com/products/first-tech-challenge-field-soft-tiles" target="_blank" rel="noopener">AndyMark</a> on Oct 7, 2026. PLA, zip ties and threaded inserts use what the ROV team paid. Rows marked <span class="est">EST</span> are rough guesses, not catalog prices.</p>
+      <p>The $1,600 last-season total is what you were told, not something the sheet confirms. Registration and travel are paid separately and aren't counted in Part 1.</p>
+      <p>What you actually buy depends on this season's game. Treat Parts 2 and 3 as a starting list for the build team to cut or add to, not an order.</p>
+    </div>
+  </section>
+
+  <!-- ================= PART 4 ================= -->
+  <style>
+  #part4 .checks{list-style:none;margin:0;padding:0;display:grid}
+  #part4 .checks li{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+  #part4 .checks li:first-child{border-top:0;padding-top:0}
+  #part4 .checks b{font-weight:600}
+  #part4 .checks p{color:var(--muted);font-size:.92rem}
+  #part4 .sev.ok{background:var(--good-bg);color:var(--good)}
+  #part4 .sev.info{background:var(--info-bg);color:var(--bar)}
+  #part4 table{min-width:820px}
+  #part4 td.inc{width:56px}
+  #part4 td.inc input{accent-color:var(--accent);width:17px;height:17px}
+  #part4 .gb{display:grid;gap:12px}
+  #part4 .grow{display:grid;grid-template-columns:minmax(110px,170px) 1fr;gap:12px;align-items:center}
+  #part4 .grow .lab{font-size:.92rem;line-height:1.2}
+  #part4 .pair{display:grid;gap:3px}
+  #part4 .pair .track{height:16px}
+  #part4 .pair .fill{height:14px}
+  #part4 .fill.prev{background:var(--bar-soft);background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--bar) 30%,transparent) 5px 7px)}
+  #part4 .track .val{font-size:.76rem}
+  #part4 .gone{display:grid;gap:0}
+  #part4 .gone div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:.92rem}
+  #part4 .gone div:first-child{border-top:0}
+  #part4 .gone .why{color:var(--muted);font-size:.8rem;display:block}
+  #part4 .inline-in{display:inline-flex;align-items:center;gap:6px}
+  </style>
+  <section id="part4">
+    <div class="sec-head">
+      <div class="eyebrow">Part 4 · 2027-28 forecast</div>
+      <h2>What next season will likely cost</h2>
+      <p>This season pays for the whole starter setup. Next season you keep the kits, hubs, motors, wheels and slides, and mostly pay for the new game, a new mechanism, and parts that wear out. It's built from your Main Budget plan, which stays as the baseline for this season.</p>
+    </div>
+
+    <div class="tiles">
+      <div class="tile"><span class="k">This season (your plan)</span><span class="v">$6,090</span><span class="s">2026-27, from Main Budget</span></div>
+      <div class="tile hi"><span class="k">Next season guess</span><span class="v" id="n-total">–</span><span class="s" id="n-total-s"></span></div>
+      <div class="tile"><span class="k">vs. $5,000</span><span class="v" id="n-vs">–</span><span class="s" id="n-vs-s"></span></div>
+      <div class="tile"><span class="k">Not bought again</span><span class="v">$2,906</span><span class="s">kits, hub, wheels, odometry, spares</span></div>
+      <div class="tile"><span class="k">Room for upgrades</span><span class="v" id="n-room">–</span><span class="s">before reaching $5,000</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>This season vs. next, by category</h3><span class="eyebrow">USD, incl. tax, shipping &amp; buffer</span></div>
+      <div class="legend">
+        <span><i class="fill prev" style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px"></i>2026-27 (your plan)</span>
+        <span><i style="background:var(--bar)"></i>2027-28 (forecast)</span>
+      </div>
+      <div class="gb" id="n-chart"></div>
+      <div class="axis" style="grid-template-columns:minmax(110px,170px) 1fr"><span></span><div class="ticks" id="n-ticks"></div></div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="panel-head"><h3>How I built the guess</h3></div>
+        <ul class="checks">
+          <li><span class="sev ok">Same</span><div><b>Registration, pizza, supplies, wanted parts and buffer repeat.</b><p>Taken straight from your Main Budget plan and Part 2, at the same prices.</p></div></li>
+          <li><span class="sev ok">Same</span><div><b>A new game set every year.</b><p>FIRST changes the game each season, so the $599 set comes back.</p></div></li>
+          <li><span class="sev info">Guess</span><div><b>About $400 for a new mechanism.</b><p>The drivetrain, hubs, slides and odometry carry over. The intake and arm get rebuilt for the new game.</p></div></li>
+          <li><span class="sev info">Guess</span><div><b>Some parts wear out.</b><p>Two batteries, two servos and a motor are budgeted as replacements after a full season of use.</p></div></li>
+          <li><span class="sev warn">Unknown</span><div><b>Next year's budget and prices.</b><p>I assumed $5,000 again and prices about 3% higher. Change both below.</p></div></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>Forecast math</h3></div>
+        <div class="totals">
+          <div class="row"><span>Comes back every season</span><span class="num" id="n-g1"></span></div>
+          <div class="row"><span>New robot &amp; worn parts</span><span class="num" id="n-g2"></span></div>
+          <div class="row"><span>Upgrades switched on</span><span class="num" id="n-g3"></span></div>
+          <div class="row"><span><label for="n-price">Price change vs. this year</label> <input type="number" id="n-price" min="-20" max="30" step="1" value="3" style="width:52px">%</span><span class="num" id="n-infl"></span></div>
+          <div class="row grand"><span>2027-28 forecast</span><span class="num" id="n-total2"></span></div>
+          <div class="row"><span><label for="n-budget">2027-28 budget</label></span><span class="inline-in">$<input type="number" id="n-budget" min="0" step="100" value="5000" style="width:84px"></span></div>
+          <div class="row grand"><span>Left over</span><span class="num" id="n-left"></span></div>
+        </div>
+        <div class="verdict" id="n-verdict"></div>
+        <p class="small muted">This season's plan ends about $1,090 short. If that isn't covered by fundraising, it could come out of next year's money and shrink the room for upgrades.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Bought this season, not needed again</h3><span class="eyebrow">reused in 2027-28</span></div>
+      <div class="gone">
+        <div><span>Starter Kit, Control Hub and Driver Kit<span class="why">Main Budget order ID-VO-1, with tax</span></span><span class="num">$1,425.73</span></div>
+        <div><span>Overnight shipping on the kits<span class="why">Main Budget ID-S-1</span></span><span class="num">$339.31</span></div>
+        <div><span>Expansion Hub<span class="why">Part 2, with tax and shipping</span></span><span class="num">$322.44</span></div>
+        <div><span>Odometry pack<span class="why">Part 2, with tax and shipping</span></span><span class="num">$328.29</span></div>
+        <div><span>Mecanum wheels<span class="why">Part 2, with tax and shipping</span></span><span class="num">$222.76</span></div>
+        <div><span>Pit kit and drivetrain spares<span class="why">your Main Budget plan, January</span></span><span class="num">$267.23</span></div>
+      </div>
+      <p class="small muted">All of this carries over unless something breaks. A broken part comes out of the "wanted parts" and buffer lines.</p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Use</th><th>Item</th><th>Category</th><th class="r">Qty</th><th class="r">Each</th><th class="r">Est. total</th></tr></thead>
+        <tbody id="n-rows"></tbody>
+      </table>
+    </div>
+    <p class="small muted">Est. total uses your Main Budget formula: parts ×1.2725 (9.25% tax, 8% shipping, 10% buffer), then the price change. Pizza uses your sheet's $216.40 for $199. Registration has no tax or shipping. Rows marked Guess are my estimates, not store prices.</p>
+  </section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const fmt = n => (n<0?'−':'') + '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0 = n => (n<0?'−':'') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const $ = id => document.getElementById(id);
+const tip = $('tip');
+function showTip(e, html){tip.innerHTML = html; tip.hidden = false; moveTip(e);}
+function moveTip(e){const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8); tip.style.left = x + 'px'; tip.style.top = (e.clientY + 14) + 'px';}
+function hideTip(){tip.hidden = true;}
+function hover(el, html){el.addEventListener('mouseenter', e=>showTip(e, typeof html==='function'?html():html)); el.addEventListener('mousemove', moveTip); el.addEventListener('mouseleave', hideTip);}
+
+function niceMax(v){for(const s of [50,100,200,250,500,1000]){const m=Math.ceil(v/s)*s; if(m/s<=5) return {max:m,step:s};} return {max:Math.ceil(v/1000)*1000,step:1000};}
+function drawBars(elId, ticksId, data){
+  const el=$(elId), tk=$(ticksId); const top=Math.max(1,...data.map(d=>d.v)); const {max,step}=niceMax(top*1.2);
+  el.innerHTML='';
+  data.forEach(d=>{const row=document.createElement('div'); row.className='hbar';
+    row.innerHTML=`<div class="lab">${d.l}${d.sub?`<small>${d.sub}</small>`:''}</div><div class="track"><div class="fill${d.soft?' soft':''}" style="width:${(d.v/max*100).toFixed(2)}%"></div><span class="val">${fmt0(d.v)}</span></div>`;
+    hover(row, `<b>${d.l}</b><br>${fmt(d.v)}${d.tip?'<br>'+d.tip:''}`); el.appendChild(row);});
+  tk.innerHTML='';
+  for(let v=0; v<=max; v+=step){const s=document.createElement('span'); s.textContent=fmt0(v); s.style.left=(v/max*100)+'%'; if(v===max) s.style.transform='translateX(-100%)'; tk.appendChild(s);}
+}
+
+/* ---------- PART 1 ---------- */
+const ROV = [
+ ['PLA filament ×3','Tools',49.37,'bought','making tools','yes','3D printing runs on it.'],
+ ['Zip ties','Frame',18.65,'bought','Its zipties','yes','Cable management. Kit only has 50.'],
+ ['Label maker','Frame',21.94,'bought','LABELLING','have','Reuse it if it\'s still around.'],
+ ['Label tape','Frame',7.68,'bought','need tape for label maker','yes','Cheap refill.'],
+ ['More label tape (not pink)','Frame',7.68,'never','MORE TAPE FOR LABEL MAKER','maybe','Only if you keep labeling.'],
+ ['1/16" CNC bits','Frame',59.95,'bought','We need it to cut more precisely','maybe','Only if you CNC plates. Actual price was $24.99.'],
+ ['Ethernet cable tester','Controls',24.68,'bought','Important to efficiently test that the ethernet cable actually works.','no','No tether in FTC.'],
+ ['Waterproof Ethernet connector','Controls',17.55,'bought','To quickly connect and detach ethernet from camera to robot','no','Underwater only.'],
+ ['Ethernet cables for testing','Controls',8.78,'bought','So we can test the waterproof thingy','no','No tether in FTC.'],
+ ['4-port USB-over-Cat6 extender','Camera',199.64,'never','So we can connect 4 camras to one screen.','no','ROV camera setup.'],
+ ['Threaded inserts','Frame',8.77,'bought','They\'re amazingly usefull but I cant find them rn','yes','Needed to bolt into 3D printed parts.'],
+ ['Bolts ×30','Frame',10.97,'bought','I need it for the frame to hold it together','maybe','REV uses M3. Check the size first.'],
+ ['Waterproof tether connector','Frame',43.88,'bought','This will help us water proof the wires to be detachable from the ROV.','no','Underwater only.'],
+ ['Acrylic sheet (end caps)','Frame',54.85,'never','If the tube has no cap it becomes a water bottle','no','Use polycarbonate if you need plates.'],
+ ['Clear acrylic sheet 15×30×3/8"','Frame',87.76,'never','We need it for end caps on kebab','no','Underwater housing.'],
+ ['Outdoor camera enclosures ×4','Camera',45.20,'bought','so the cameras arent in contact with the water','no','Underwater only.'],
+ ['CNC bits (reorder)','Frame',68.29,'bought','We\'re almost out','maybe','Same listing as the first order.'],
+ ['Buck converters ×8','Camera',21.94,'bought','no fry box','no','REV hubs handle power.'],
+ ['16 gauge wire','Frame',82.28,'bought','wires for tether','no','Tether. Leftovers could still be useful.'],
+ ['15 gauge wire','Frame',82.28,'bought','wire for tether','no','Tether. Leftovers could still be useful.'],
+ ['90° USB adapters ×3','Controls',19.75,'bought','To make sure the kebab will be able to slide out','maybe','Handy for a webcam on the Control Hub.'],
+ ['12V AC/DC adapter','Controls',13.16,'bought','power','no','Not needed with REV batteries.'],
+ ['Carabiners and tape','Not listed',28.74,'manual','','maybe','Tape yes, carabiners no.'],
+ ['Water bottle and sponge','Not listed',46.62,'manual','','no','Pool testing.'],
+ ['Ethernet cable clamp set','Not listed',35.10,'manual','','no','Tether.'],
+ ['Power cord','Not listed',48.27,'manual','','maybe','An extension cord is useful in the pit.'],
+ ['Desiccants','Not listed',21.94,'manual','','no','Keeps housings dry.'],
+ ['Waterproof cable connectors','Not listed',15.36,'manual','','no','Underwater only.']
+];
+const VERD = {yes:['Need again','v-yes'], have:['Have it','v-have'], maybe:['Maybe','v-maybe'], no:['ROV only','v-no']};
+const STAT = {bought:['Bought','bought'], manual:['Manual','manual'], never:['Never bought','never']};
+const spentRows = ROV.filter(r=>r[3]!=='never');
+const sumOf = rs => rs.reduce((a,r)=>a+r[2],0);
+const rovOnly = sumOf(spentRows.filter(r=>r[5]==='no'));
+$('rovOnly').textContent = fmt0(rovOnly);
+$('rovOnlyS').textContent = Math.round(rovOnly/sumOf(spentRows)*100) + '% of logged spending won\'t repeat';
+
+const bySys = {};
+spentRows.forEach(r=>{const k=r[1]==='Not listed'?'Manual (no system)':r[1]; bySys[k]=(bySys[k]||0)+r[2];});
+const sysData = Object.entries(bySys).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v);
+sysData.unshift({l:'Never logged', sub:'$1,600 minus the sheet', v:1600-sumOf(spentRows), soft:true, tip:'Spent but not recorded anywhere'});
+drawBars('sysChart','sysTicks', sysData);
+
+let p1filter = 'all';
+const filters = [['all','All'],['yes','Need again'],['have','Have it'],['maybe','Maybe'],['no','ROV only']];
+filters.forEach(([k,l])=>{const b=document.createElement('button'); b.type='button'; b.className='fbtn'; b.id='f-'+k;
+  const n = k==='all'?ROV.length:ROV.filter(r=>r[5]===k).length;
+  b.innerHTML = `${l} <span class="c">${n}</span>`; b.setAttribute('aria-pressed', k==='all');
+  b.addEventListener('click',()=>{p1filter=k; document.querySelectorAll('#p1filters .fbtn').forEach(x=>x.setAttribute('aria-pressed', x===b)); renderP1();});
+  $('p1filters').appendChild(b);});
+function renderP1(){
+  const rs = ROV.filter(r=>p1filter==='all'||r[5]===p1filter);
+  $('p1rows').innerHTML = rs.map(r=>`<tr><td><b style="font-weight:600">${r[0]}</b></td><td>${r[1]}</td><td><span class="st ${STAT[r[3]][1]}">${STAT[r[3]][0]}</span></td><td class="r num">${fmt(r[2])}</td><td class="why">${r[4]?'“'+r[4]+'”':'<span style="font-style:normal">—</span>'}</td><td><span class="st ${VERD[r[5]][1]}">${VERD[r[5]][0]}</span><span class="note">${r[6]}</span></td></tr>`).join('');
+  const again = ROV.filter(r=>r[5]==='yes'), mb = ROV.filter(r=>r[5]==='maybe');
+  $('p1sum').innerHTML = `${again.length} items are worth buying again (${fmt0(sumOf(again))} last year), mostly 3D printing and shop supplies. Those are in Part 2's supplies list. ${mb.length} more are maybes worth ${fmt0(sumOf(mb))}. Everything else was for working underwater.`;
+}
+renderP1();
+
+/* ---------- PART 2 ---------- */
+const TAX=.0925, SHIP=.08, CAP=5000, SPENT=2115.04, PLANNED=1026.55;
+const items = [
+  {c:'Drivetrain', n:'Mecanum wheel set (4 wheels)', src:'goBILDA GripForce 104mm', t:'must', q:1, p:189.99, note:'Kit has no mecanum wheels. Check the hub fits a 5mm hex shaft.'},
+  {c:'Drivetrain', n:'UltraPlanetary motor (4th drive motor)', src:'REV-41-1600', t:'must', q:1, p:50.00, note:'Kit has 3.'},
+  {c:'Lift / Slides', n:'2-stage Viper-Slide kit', src:'goBILDA, belt-driven 336mm', t:'must', q:1, p:159.99, note:'Cheaper REV option: Extrusion Lift Kit, $126.50.'},
+  {c:'Lift / Slides', n:'UltraPlanetary motor (lift)', src:'REV-41-1600', t:'must', q:1, p:50.00},
+  {c:'Arm / Intake / Claw', n:'Torque servos', src:'goBILDA 2000 Series 25-2', t:'must', q:2, p:36.99, note:'Kit\'s REV servos are discontinued.'},
+  {c:'Arm / Intake / Claw', n:'Extra torque servos', src:'goBILDA 2000 Series 25-2', t:'should', q:2, p:36.99, note:'Claw and wrist.'},
+  {c:'Arm / Intake / Claw', n:'UltraPlanetary motor (arm)', src:'REV-41-1600', t:'should', q:1, p:50.00, note:'Kit\'s Core Hex can run a light intake.'},
+  {c:'Electronics & Power', n:'Expansion Hub', src:'REV-31-1153', t:'must', q:1, p:275.00, note:'Control Hub has only 4 motor ports.'},
+  {c:'Electronics & Power', n:'12V Slim Battery', src:'REV-31-1302', t:'must', q:2, p:60.00, note:'Kit has 1. Events need 2–3 charged.'},
+  {c:'Electronics & Power', n:'Wires and connectors', src:'extensions, XT30, servo cables', t:'should', q:1, p:40.00, est:true},
+  {c:'Sensors / Autonomous', n:'Odometry pack (2 pods + Pinpoint)', src:'goBILDA 4-Bar', t:'should', q:1, p:279.99, note:'Accurate position tracking for autonomous.'},
+  {c:'Sensors / Autonomous', n:'USB webcam for vision', src:'any UVC webcam', t:'should', q:1, p:40.00, est:true},
+  {c:'Frame / Structure', n:'Extra 15mm extrusion', src:'REV, $6–$29.75 per piece', t:'should', q:1, p:60.00, est:true},
+  {c:'Frame / Structure', n:'Hardware restock', src:'M3 screws, nuts, brackets', t:'should', q:1, p:50.00, est:true},
+  {c:'3D Printing & Shop Supplies', n:'PLA filament, 1 kg spools', src:'last year paid $15 a spool', t:'must', q:6, p:15.00, note:'Brackets, guards, mounts. Teams go through a lot.'},
+  {c:'3D Printing & Shop Supplies', n:'Heat-set threaded inserts', src:'last year paid $7.99', t:'must', q:1, p:7.99, note:'Lets you bolt into printed parts.'},
+  {c:'3D Printing & Shop Supplies', n:'Zip ties', src:'last year paid $17', t:'must', q:1, p:17.00},
+  {c:'3D Printing & Shop Supplies', n:'TPU or PETG spool', src:'for grippy or tougher parts', t:'should', q:1, p:25.00, est:true},
+  {c:'3D Printing & Shop Supplies', n:'Nozzles, glue stick, bed care', src:'printer upkeep', t:'should', q:1, p:15.00, est:true},
+  {c:'3D Printing & Shop Supplies', n:'Tape, velcro, double-sided tape', src:'shop basics', t:'should', q:1, p:20.00, est:true},
+  {c:'3D Printing & Shop Supplies', n:'Label tape', src:'last year paid $7.68', t:'should', q:1, p:7.00}
+];
+const tiers = {must:$('t-must'), should:$('t-should')};
+const cats = [...new Set(items.map(i=>i.c))];
+function build2(){
+  const tb=$('rows2'); tb.innerHTML='';
+  cats.forEach((c,ci)=>{const tr=document.createElement('tr'); tr.className='cat'; tr.innerHTML=`<td colspan="5">${c}<span class="num" id="cat-${ci}"></span></td>`; tb.appendChild(tr);
+    items.forEach((it,i)=>{ if(it.c!==c) return; const r=document.createElement('tr'); r.id='row-'+i;
+      r.innerHTML=`<td><b style="font-weight:600">${it.n}</b>${it.est?'<span class="est">EST</span>':''}<span class="note">${it.src}${it.note?' · '+it.note:''}</span></td><td><span class="pill ${it.t}">${it.t}</span></td><td class="r qtycell"><input type="number" min="0" max="50" step="1" id="q-${i}" value="${it.q}" aria-label="Quantity of ${it.n}"></td><td class="r num">${fmt(it.p)}</td><td class="r num" id="l-${i}"></td>`;
+      tb.appendChild(r); r.querySelector('input').addEventListener('input',e=>{it.q=Math.max(0,parseInt(e.target.value)||0); update();});});});
+}
+
+/* ---------- PART 3 ---------- */
+const packs = [
+  {id:'pdt', sys:'Drivetrain', n:'Practice drivetrain', items:[['4 UltraPlanetary motors',200],['Mecanum wheel set',189.99],['Frame extrusion and C-channel',100,1],['Brackets and screws',40,1]], why:'Drivers and coders practice while the arm gets built. Shares the Control Hub and battery.'},
+  {id:'dsp', sys:'Drivetrain', n:'Drivetrain spares', items:[['Spare UltraPlanetary motor',50],['Hex shafts, bearings, collars',25,1]], why:'A dead drive motor at an event ends your day.'},
+  {id:'lift', sys:'Lift / Slides', n:'Lift backup', items:[['Second 2-stage Viper-Slide kit',159.99],['Second lift motor',50]], why:'Spare slides, or a second motor if the lift is heavy.'},
+  {id:'arm', sys:'Arm / Intake / Claw', n:'Arm and claw spares', items:[['2 torque servos',73.98],['Spare UltraPlanetary motor',50]], why:'Servos strip gears. Having spares keeps you running.'},
+  {id:'pwr', sys:'Electronics & Power', n:'Power and charging', items:[['4th 12V Slim Battery',60],['Second battery charger',39.50]], why:'Charge two batteries at once between matches.'},
+  {id:'vis', sys:'Sensors / Autonomous', n:'Limelight 3A camera', items:[['Limelight 3A smart camera',189]], why:'Much easier vision than a webcam. Sold out at goBILDA right now.'},
+  {id:'sen', sys:'Sensors / Autonomous', n:'Color sensors', items:[['2 REV Color Sensor V3',41.50]], why:'Detects game pieces in the intake.'},
+  {id:'str', sys:'Frame / Structure', n:'Structure stock', items:[['Polycarbonate or plywood sheet',40,1],['Extra extrusion',60,1]], why:'For rebuilds and redesigns mid-season.'},
+  {id:'field', sys:'Practice', n:'Half practice field', items:[['18 AndyMark soft tiles',147]], why:'Drive on real tiles. A full 36-tile field is $293.'},
+  {id:'box', sys:'Spares', n:'Spare parts box', items:[['Mecanum rollers, belt, misc.',80,1]], why:'Small things that break at events.'},
+  {id:'pit', sys:'Events', n:'Pit kit', items:[['Power strip, extension cord, toolbox, tools',75,1]], why:'Last year\'s team bought a $48 power cord.'}
+];
+packs.forEach(p=>{p.pre=p.items.reduce((a,x)=>a+x[1],0); p.tot=p.pre*(1+TAX+SHIP); p.on=false;});
+function buildPacks(){
+  const el=$('packs');
+  packs.forEach(p=>{const d=document.createElement('article'); d.className='pack'; d.id='pk-'+p.id;
+    d.innerHTML=`<div class="sys">${p.sys}</div><h3>${p.n}</h3><div style="display:grid;gap:6px"><ul>${p.items.map(x=>`<li>${x[0]} · <span class="num">${fmt(x[1])}</span>${x[2]?'<span class="est">EST</span>':''}</li>`).join('')}</ul><p class="small muted">${p.why}</p></div><div class="foot"><div class="cost"><b>+${fmt(p.tot)}</b><span>with tax &amp; shipping</span></div><button type="button" class="addbtn" id="btn-${p.id}" aria-pressed="false">Add</button></div>`;
+    el.appendChild(d);
+    d.querySelector('button').addEventListener('click',()=>{p.on=!p.on; update();});});
+  $('addAll').addEventListener('click',()=>{packs.forEach(p=>p.on=true); update();});
+  $('clearAll').addEventListener('click',()=>{packs.forEach(p=>p.on=false); update();});
+}
+
+function drawSeason(barId, legendId, segs){
+  const bar=$(barId), total=segs.reduce((a,s)=>a+s.v,0), max=Math.max(CAP,total)*1.04;
+  const segEl=bar.querySelector('.segs'); segEl.innerHTML='';
+  segs.forEach(s=>{ if(s.v<=0) return; const d=document.createElement('div'); d.style.width=(s.v/max*100)+'%'; if(s.cls){d.className=s.cls; d.style.backgroundColor=s.c;} else d.style.background=s.c; hover(d,`<b>${s.l}</b><br>${fmt(s.v)}`); segEl.appendChild(d);});
+  bar.querySelector('.cap').style.left=(CAP/max*100)+'%';
+  $(legendId).innerHTML = segs.filter(s=>s.v>0).map(s=>`<span><i style="background-color:${s.c}"${s.cls?' class="'+s.cls+'"':''}></i>${s.l} <b>${fmt0(s.v)}</b></span>`).join('');
+  return total;
+}
+
+function update(){
+  let parts=0; const byCat={}; cats.forEach(c=>byCat[c]=0);
+  items.forEach((it,i)=>{const on=tiers[it.t].checked, line=it.q*it.p; $('l-'+i).textContent=fmt(line); $('row-'+i).classList.toggle('off',!on); if(on){parts+=line; byCat[it.c]+=line;}});
+  cats.forEach((c,ci)=>$('cat-'+ci).textContent=fmt(byCat[c]));
+  const tax=parts*TAX, ship=parts*SHIP, bp=Math.max(0,parseFloat($('bufpct').value)||0)/100, buf=(parts+tax+ship)*bp;
+  const robot=parts+tax+ship, newSpend=robot+buf, season=SPENT+PLANNED+newSpend;
+  $('o-parts').textContent=fmt(parts); $('o-tax').textContent=fmt(tax); $('o-ship').textContent=fmt(ship); $('o-buf').textContent=fmt(buf);
+  $('o-new').textContent=fmt(newSpend); $('o-season').textContent=fmt(season);
+  drawBars('catChart','catTicks', cats.map(c=>({l:c,v:byCat[c]})).sort((a,b)=>b.v-a.v));
+  const base=[{l:'Spent',v:SPENT,c:'var(--s-spent)'},{l:'Planned',v:PLANNED,c:'var(--s-planned)'},{l:'Robot parts',v:robot,c:'var(--s-parts)'},{l:'Buffer',v:buf,c:'var(--s-parts)',cls:'seg-buffer'}];
+  drawSeason('sbar2','slegend2', base);
+  const d2=season-CAP; $('seasonTag').textContent=Math.round(season/CAP*100)+'% of $5,000';
+  $('verdict2').innerHTML = d2>0 ? `<span class="chip bad">OVER</span> ${fmt(d2)} past $5,000 without any extras.` : `<span class="chip good">UNDER</span> ${fmt(-d2)} below $5,000.`;
+  // part 3
+  let extra=0; packs.forEach(p=>{if(p.on) extra+=p.tot; $('btn-'+p.id).setAttribute('aria-pressed',p.on); $('btn-'+p.id).textContent=p.on?'Added':'Add'; $('pk-'+p.id).classList.toggle('on',p.on);});
+  const all=drawSeason('sbar3','slegend3',[...base,{l:'Extras',v:extra,c:'var(--s-extra)'}]);
+  const n=packs.filter(p=>p.on).length, d3=all-CAP;
+  $('t-total').textContent=fmt(all);
+  $('t-sub').innerHTML = `${n} extra${n===1?'':'s'} (${fmt0(extra)}) · ` + (d3>0?`<b style="color:var(--bad)">${fmt0(d3)} over $5,000</b>`:`<b style="color:var(--good)">${fmt0(-d3)} under $5,000</b>`);
+}
+build2(); buildPacks();
+Object.values(tiers).forEach(t=>t.addEventListener('change',update));
+$('bufpct').addEventListener('input',update);
+update();
+</script>
+<script>
+/* ---------- PART 4: 2027-28 forecast (separate script; Parts 1-3 untouched) ---------- */
+(function(){
+  const fm = n => (n<0?'−':'') + '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const f0 = n => (n<0?'−':'') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+  const g = id => document.getElementById(id);
+  const MULT = {parts:1+.0925+.08+.10, food:216.40/199, fixed:1, other:1+.0925+.08};
+  const GROUPS = [['every','Comes back every season'],['wear','New robot & worn parts'],['up','Optional upgrades']];
+  const rows = [
+    {gp:'every', c:'Registration', n:'FTC team registration', q:1, p:350, k:'fixed', on:true, note:'Same as this year\'s Main Budget. FIRST may change it.'},
+    {gp:'every', c:'Game set', n:'Game set for the new game', q:1, p:599, k:'parts', on:true, note:'New game every season. This year\'s set was $599.'},
+    {gp:'every', c:'Food', n:'Pizza', q:1, p:199, k:'food', on:true, note:'Your number, 2 Costco pizzas.'},
+    {gp:'every', c:'Supplies', n:'3D printing & shop supplies', q:1, p:181.99, k:'parts', on:true, note:'Same as Part 2: PLA, inserts, zip ties, tape.'},
+    {gp:'every', c:'Wanted & buffer', n:'Wanted parts', q:1, p:250, k:'parts', on:true, note:'Same as your plan.'},
+    {gp:'every', c:'Wanted & buffer', n:'Buffer zone', q:1, p:100, k:'parts', on:true, note:'Same as your plan.'},
+    {gp:'wear', c:'Robot parts', n:'Mechanism parts for the new game', q:1, p:400, k:'parts', on:true, guess:true, note:'New intake and arm. Drive, hubs and slides carry over.'},
+    {gp:'wear', c:'Robot parts', n:'Replacement batteries', q:2, p:60, k:'parts', on:true, guess:true, note:'Batteries hold less charge after a season of use.'},
+    {gp:'wear', c:'Robot parts', n:'Replacement torque servos', q:2, p:36.99, k:'parts', on:true, guess:true, note:'Servos strip gears.'},
+    {gp:'wear', c:'Robot parts', n:'Replacement UltraPlanetary motor', q:1, p:50, k:'parts', on:true, guess:true},
+    {gp:'wear', c:'Robot parts', n:'Extrusion and hardware restock', q:1, p:110, k:'parts', on:true, note:'Same as this year\'s Should lines.'},
+    {gp:'wear', c:'Spares & pit', n:'Spare parts box refill', q:1, p:50, k:'parts', on:true, guess:true, note:'About half of this year\'s box.'},
+    {gp:'up', c:'Upgrades', n:'Practice drivetrain', q:1, p:529.99, k:'parts', on:false, note:'From Part 3. Shares the Control Hub.'},
+    {gp:'up', c:'Upgrades', n:'Second Control Hub', q:1, p:350, k:'parts', on:false, note:'Run the practice drivetrain at the same time. Price from Main Budget.'},
+    {gp:'up', c:'Upgrades', n:'Limelight 3A camera', q:1, p:189, k:'parts', on:false},
+    {gp:'up', c:'Upgrades', n:'Half practice field (18 tiles)', q:1, p:147, k:'parts', on:false, note:'Tiles last for years.'},
+    {gp:'up', c:'Upgrades', n:'Team shirts', q:12, p:15, k:'other', on:false, guess:true, note:'Change the qty to your team size.'}
+  ];
+  // 2026-27 from the Main Budget plan (Future Planning + P&L), grouped the same way
+  const PREV = {'Kits & kit shipping':1765.04,'Registration':350,'Game set':762.23,'Robot parts':1925.19,'Supplies':231.59,'Spares & pit':394.48,'Wanted & buffer':445.38,'Food':216.40,'Upgrades':0};
+  const CATS = Object.keys(PREV);
+  const infl = () => 1 + (parseFloat(g('n-price').value)||0)/100;
+  const est = r => r.q*r.p*MULT[r.k]*infl();
+
+  function build(){
+    const tb = g('n-rows'); tb.innerHTML='';
+    GROUPS.forEach(([gp,label])=>{
+      const h=document.createElement('tr'); h.className='cat'; h.innerHTML=`<td colspan="6">${label}<span class="num" id="n-sum-${gp}"></span></td>`; tb.appendChild(h);
+      rows.forEach((r,i)=>{ if(r.gp!==gp) return;
+        const tr=document.createElement('tr'); tr.id='n-row-'+i;
+        tr.innerHTML=`<td class="inc qtycell"><input type="checkbox" id="n-on-${i}" ${r.on?'checked':''} aria-label="Include ${r.n}"></td>
+          <td><b style="font-weight:600">${r.n}</b>${r.guess?'<span class="est">GUESS</span>':''}${r.note?`<span class="note">${r.note}</span>`:''}</td>
+          <td>${r.c}</td>
+          <td class="r qtycell"><input type="number" min="0" max="99" step="1" id="n-q-${i}" value="${r.q}" aria-label="Quantity of ${r.n}"></td>
+          <td class="r qtycell"><input type="number" min="0" step="5" id="n-p-${i}" value="${r.p}" style="width:84px" aria-label="Price each of ${r.n}"></td>
+          <td class="r num" id="n-t-${i}"></td>`;
+        tb.appendChild(tr);
+        tr.querySelector('#n-on-'+i).addEventListener('change',e=>{r.on=e.target.checked; calc();});
+        tr.querySelector('#n-q-'+i).addEventListener('input',e=>{r.q=Math.max(0,parseFloat(e.target.value)||0); calc();});
+        tr.querySelector('#n-p-'+i).addEventListener('input',e=>{r.p=Math.max(0,parseFloat(e.target.value)||0); calc();});
+      });
+    });
+  }
+
+  function chart(next){
+    const el=g('n-chart'), tk=g('n-ticks');
+    const top=Math.max(...CATS.map(c=>Math.max(PREV[c],next[c])));
+    const {max,step}=niceMax(top*1.18);
+    el.innerHTML='';
+    CATS.forEach(c=>{
+      const row=document.createElement('div'); row.className='grow';
+      row.innerHTML=`<div class="lab">${c}</div><div class="pair">
+        <div class="track"><div class="fill prev" style="width:${(PREV[c]/max*100).toFixed(2)}%"></div><span class="val">${f0(PREV[c])}</span></div>
+        <div class="track"><div class="fill" style="width:${(next[c]/max*100).toFixed(2)}%"></div><span class="val">${f0(next[c])}</span></div></div>`;
+      hover(row, ()=>`<b>${c}</b><br>2026-27: ${fm(PREV[c])}<br>2027-28: ${fm(next[c])}`);
+      el.appendChild(row);
+    });
+    tk.innerHTML='';
+    for(let v=0; v<=max; v+=step){const s=document.createElement('span'); s.textContent=f0(v); s.style.left=(v/max*100)+'%'; if(v===max) s.style.transform='translateX(-100%)'; tk.appendChild(s);}
+  }
+
+  function calc(){
+    const sums={every:0,wear:0,up:0}, next={}; CATS.forEach(c=>next[c]=0);
+    let base=0;
+    rows.forEach((r,i)=>{const t=est(r); g('n-t-'+i).textContent=fm(t); g('n-row-'+i).classList.toggle('off',!r.on);
+      if(!r.on) return; sums[r.gp]+=t; next[r.c]+=t; base+=r.q*r.p*MULT[r.k];});
+    const total=sums.every+sums.wear+sums.up, budget=parseFloat(g('n-budget').value)||0, left=budget-total;
+    GROUPS.forEach(([gp])=>g('n-sum-'+gp).textContent=fm(sums[gp]));
+    g('n-g1').textContent=fm(sums.every/infl()); g('n-g2').textContent=fm(sums.wear/infl()); g('n-g3').textContent=fm(sums.up/infl());
+    g('n-infl').textContent=fm(total-base);
+    g('n-total').textContent=f0(total); g('n-total2').textContent=fm(total);
+    g('n-total-s').textContent=`${Math.round((1-total/6090.30)*100)}% less than this season`;
+    g('n-vs').textContent=f0(Math.abs(left)); g('n-vs-s').textContent=left>=0?'under budget':'over budget';
+    const upAll=rows.filter(r=>r.gp==='up').reduce((a,r)=>a+r.q*r.p*MULT[r.k]*infl(),0);
+    g('n-room').textContent=f0(Math.max(0,left));
+    g('n-left').textContent=fm(left);
+    g('n-verdict').innerHTML = left>=0
+      ? `<span class="chip good">FITS</span> ${fm(left)} left. Every upgrade on the list costs ${f0(upAll)}${upAll<=budget-(sums.every+sums.wear)?', and all of them still fit.':'.'}`
+      : `<span class="chip bad">OVER</span> ${fm(-left)} past the budget.`;
+    chart(next);
+  }
+  build();
+  g('n-price').addEventListener('input',calc); g('n-budget').addEventListener('input',calc);
+  calc();
+})();
+</script>
+
+</body></html>
